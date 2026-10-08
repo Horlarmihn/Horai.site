@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORAI — News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#07080a; --panel:#101215; --panel-2:#15181c; --line:#262b30;
+    --white:#f4f6f7; --fog:#b7bcc1; --lime:#c8ff3d; --red:#ff4557;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ink); color:var(--white); font-family:'Inter', sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Barlow Condensed', sans-serif; text-transform:uppercase; line-height:0.95;}
+  .mono{font-family:'Space Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+
+  nav{position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(7,8,10,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; padding:18px 28px; max-width:1180px; margin:0 auto;}
+  .logo{font-family:'Barlow Condensed', sans-serif; font-weight:800; font-size:26px;}
+  .logo span{color:var(--lime);}
+  .nav-links{display:flex; gap:28px; font-size:13px; font-weight:700; text-transform:uppercase; font-family:'Space Mono',monospace;}
+  .nav-links a{color:var(--fog);}
+  .nav-links a:hover, .nav-links a.active{color:var(--lime);}
+
+  .page-head{padding:150px 0 50px; position:relative;}
+  .kicker{font-family:'Space Mono', monospace; font-size:12px; color:var(--lime); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:14px; display:block; font-weight:700;}
+  .page-head h1{font-size:clamp(40px,6vw,64px); font-weight:800;}
+  .page-head p{color:var(--fog); margin-top:14px; font-size:17px; max-width:600px; font-weight:500;}
+
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:100px;}
+  @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:620px){.grid{grid-template-columns:1fr;}}
+
+  .card{background:var(--panel); cursor:pointer; transition:background 0.2s; display:flex; flex-direction:column;}
+  .card:hover{background:var(--panel-2);}
+  .card-img{width:100%; aspect-ratio:16/10; background:var(--panel-2); overflow:hidden;}
+  .card-img img{width:100%; height:100%; object-fit:cover; display:block;}
+  .card-body{padding:22px 24px; flex:1; display:flex; flex-direction:column;}
+  .card-date{font-family:'Space Mono',monospace; font-size:10.5px; color:var(--lime); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .card h3{font-size:21px; font-weight:800; margin-bottom:10px; line-height:1.15;}
+  .card p{color:var(--fog); font-size:14px; line-height:1.55; font-weight:500; margin-top:auto;}
+
+  .empty{padding:60px 0; text-align:center; color:var(--fog);}
+
+  /* Article detail overlay */
+  .detail{display:none; position:fixed; inset:0; background:var(--ink); z-index:100; overflow-y:auto;}
+  .detail.open{display:block;}
+  .detail-inner{max-width:760px; margin:0 auto; padding:110px 28px 100px;}
+  .back-btn{display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:13px; color:var(--lime); text-transform:uppercase; font-weight:700; margin-bottom:30px; cursor:pointer; background:none; border:none;}
+  .detail-date{font-family:'Space Mono',monospace; font-size:12px; color:var(--lime); text-transform:uppercase; margin-bottom:14px; font-weight:700;}
+  .detail h2{font-size:clamp(30px,5vw,48px); font-weight:800; margin-bottom:24px; line-height:1.1;}
+  .detail-img{width:100%; border-radius:4px; margin-bottom:30px; display:block;}
+  .detail-body{font-size:18px; line-height:1.75; color:var(--white); font-weight:500;}
+  .detail-body p{margin-bottom:20px;}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; text-align:center; color:var(--fog); font-size:13px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">HOR<span>AI</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="news.html" class="active">News</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-head wrap">
+  <span class="kicker">HORAI News</span>
+  <h1>Stories &amp; Breakdowns</h1>
+  <p>Articles, match analysis, and everything else HORAI publishes beyond the social feed.</p>
+</div>
+
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<footer>© 2026 HORAI. Sports Intelligence.</footer>
+
+<div class="detail" id="detail">
+  <div class="detail-inner">
+    <button class="back-btn" id="backBtn">← Back to all stories</button>
+    <div class="detail-date" id="detailDate"></div>
+    <h2 id="detailTitle"></h2>
+    <img class="detail-img" id="detailImg" src="" alt="">
+    <div class="detail-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+let articles = [];
+
+function formatDate(iso){
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  if(!articles.length){
+    grid.outerHTML = '<div class="empty">No articles yet. Add one in articles.json.</div>';
+    return;
+  }
+  // newest first
+  const sorted = [...articles].sort((a,b) => new Date(b.date) - new Date(a.date));
+  grid.innerHTML = sorted.map(a => `
+    <div class="card" onclick="openArticle(${a.id})">
+      <div class="card-img"><img src="${a.image}" alt="${a.title}" onerror="this.parentElement.style.display='none'"></div>
+      <div class="card-body">
+        <div class="card-date">${formatDate(a.date)}</div>
+        <h3>${a.title}</h3>
+        <p>${a.excerpt}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openArticle(id){
+  const a = articles.find(x => x.id === id);
+  if(!a) return;
+  document.getElementById('detailDate').textContent = formatDate(a.date);
+  document.getElementById('detailTitle').textContent = a.title;
+  const img = document.getElementById('detailImg');
+  img.src = a.image;
+  img.onerror = () => { img.style.display = 'none'; };
+  img.style.display = 'block';
+  document.getElementById('detailBody').innerHTML = a.content
+    .split('\n\n')
+    .map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`)
+    .join('');
+  document.getElementById('detail').classList.add('open');
+  window.scrollTo(0,0);
+}
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('detail').classList.remove('open');
+});
+
+fetch('articles.json')
+  .then(r => r.json())
+  .then(data => { articles = data; renderGrid(); })
+  .catch(() => {
+    document.getElementById('grid').outerHTML = '<div class="empty">Couldn\'t load articles.json — make sure it\'s uploaded in the same folder as this page.</div>';
+  });
+</script>
+
+</body>
+</html>
